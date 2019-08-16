@@ -17,10 +17,13 @@ public class Main {
         // TODO code application logic here
         AdjListGraph graph = new AdjListGraph(5);
         graph.addEdge("bus", 0, 1, 10, 5, 30);
+        graph.addEdge("bus", 0, 1, 5, 2, 30);
+        graph.addEdge("bus", 0, 2, 15, 10, 30);
         graph.addEdge("tricycle", 1, 2, 10, 3, 30);
         graph.addEdge("bus", 1, 2, 10, 10, 30);
         //graph.addEdge("train", 2, 1, 20, 5, 30);
         graph.addEdge("fx", 2, 3, 34, 12, 30);
+        graph.addEdge("fx", 2, 5, 34, 50, 30);
         graph.addEdge("bus", 3, 4, 10, 5, 30);
         graph.addEdge("bus", 4, 5, 10, 5, 30);
 
