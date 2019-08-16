@@ -1,9 +1,10 @@
+package samsungprojectprototype;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,54 +46,67 @@ public class AdjListGraph {
     }
 
     //dijsktra
-    public void findShortest() {
-        int[][] dist = new int[V][V];
-        Edge[][] pred = new Edge[V][V];
+//    public void findShortest() {
+//        int[][] dist = new int[V][V];
+//        Edge[][] pred = new Edge[V][V];
+//
+//        for (int i = 0; i < V; i++) {
+//            for (int j = 0; j < V; j++) {
+//                dist[i][j] = 1_000_000_000;
+//            }
+//        }
+//
+//        dist[0][0] = 0;
+//
+//        PriorityQueue<Edge> pq = new PriorityQueue<>(distComparator);
+//        pq.add(terminals.get(0).get(0));
+//
+//        while (!pq.isEmpty()) {
+//            System.out.println(pq);
+//
+//            Edge curr = pq.poll();
+//            if (curr.getDist() > dist[curr.getSrc()][curr.getDest()]) continue;
+//
+//            //if destination is reached
+//            if (curr.getDest() == V - 1) {
+//                ArrayList<Edge> path = new ArrayList<>();
+//                Edge c = curr;
+//
+//                while (c.getSrc() != 0) {
+//                    c = pred[c.getSrc()][c.getDest()];
+//                    path.add(c);
+//                }
+//
+//                //System.out.println("Shortest path: ");
+//                //for (int i = path.size(); i >= 0; i--) {
+//                //    System.out.print(c.getMode() + " " + path.get(i) + ", ");
+//                // }
+//                System.out.println("\nDistance: " + dist[curr.getSrc()][curr.getDest()]);
+//                //return dist[curr.getSrc()][curr.getDest()];
+//            }
+//
+//            //System.out.println(terminals.get(curr.getDest()));
+//            //for each destination of curr check distance
+//            for (Edge e : terminals.get(curr.getDest())) {
+//                System.out.println(e.getDist());
+//                if (dist[curr.getDest()][e.getDest()] == 1_000_000_000 || dist[curr.getDest()][e.getDest()] > dist[curr.getSrc()][curr.getDest()] + e.getDist()) {
+//
+//                    dist[curr.getDest()][e.getDest()] = dist[curr.getSrc()][curr.getDest()] + e.getDist();
+//                    pred[curr.getDest()][e.getDest()] = curr;
+//                    //System.out.println("uwu");
+//                    pq.add(e);
+//                }
+//            }
+//        }
+//
+//        //return -1;
+//    }
+    public void findShortestDistance() {
 
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++) {
-                dist[i][j] = -1;
-            }
-        }
+    }
 
-        PriorityQueue<Edge> pq = new PriorityQueue<>(distComparator);
-        pq.add(terminals.get(0).get(0));
-
-        while (!pq.isEmpty()) {
-            Edge curr = pq.poll();
-            if (curr.getDist() > dist[curr.getSrc()][curr.getDest()]) continue;
-
-            //if destination is reached
-            if (curr.getDest() == V - 1) {
-                ArrayList<Edge> path = new ArrayList<>();
-                Edge c = curr;
-
-                while (c.getSrc() != 0) {
-                    c = pred[c.getSrc()][c.getDest()];
-                    path.add(c);
-                }
-
-                System.out.println("Shortest path: ");
-                for (int i = path.size(); i >= 0; i--) {
-                    System.out.print(path.get(i) + ", ");
-                }
-
-                System.out.println("\nDistance: " + dist[curr.getSrc()][curr.getDest()]);
-                //return dist[curr.getSrc()][curr.getDest()];
-            }
-
-            //for each destination of curr check distance
-            for (Edge e : terminals.get(curr.getDest())) {
-                if (dist[curr.getDest()][e.getDest()] > dist[curr.getSrc()][curr.getDest()] + e.getDist()) {
-                    dist[curr.getDest()][e.getDest()] = dist[curr.getSrc()][curr.getDest()] + e.getDist();
-                    pred[curr.getDest()][e.getDest()] = curr;
-
-                    pq.add(e);
-                }
-            }
-        }
-
-        //return -1;
+    public ArrayList<ArrayList<Edge>> getTerminals() {
+        return terminals;
     }
 }
 
@@ -139,6 +153,10 @@ class Edge {
 
     public int computeTravelTime() {
         return dist / spd;
+    }
+
+    public String getMode() {
+        return mode;
     }
 
 }
