@@ -57,11 +57,12 @@ public class AdjListGraph {
             }
         }
 
-        pq.add(terminals.get(0).get(0));
+        //pq.add(terminals.get(0).get(0));
         dist[0][0] = 0;
 
         for (Edge e : terminals.get(0)) {
             dist[0][e.getDest()] = e.getDist();
+            pq.add(e);
         }
 
         while (!pq.isEmpty()) {
