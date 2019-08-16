@@ -1,4 +1,3 @@
-package samsungprojectprototype;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -52,7 +51,7 @@ public class AdjListGraph {
         Edge pred[][] = new Edge[V + 5][V + 5];
 
         for (int i = 0; i < V + 5; i++) {
-            for (int j = 0; j < V + 0; j++) {
+            for (int j = 0; j < V + 5; j++) {
                 dist[i][j] = 1_000_000_000;
             }
         }
@@ -67,7 +66,7 @@ public class AdjListGraph {
 
         while (!pq.isEmpty()) {
             Edge curr = pq.poll();
-            System.out.println(curr.getMode());
+            //System.out.println(curr.getMode());
 
             if (curr.getDest() == V - 1) {
                 System.out.println("Found destination.");
@@ -86,11 +85,13 @@ public class AdjListGraph {
                 }
 
                 System.out.println("Total Distance: " + dist[curr.getSrc()][curr.getDest()]);
+                break;
             }
 
             if (curr.getDest() > dist[curr.getSrc()][curr.getDest()]) continue;
 
             for (Edge adj : terminals.get(curr.getDest())) {
+                //System.out.println(dist[curr.getDest()][adj.getDest()]);
                 if (dist[curr.getDest()][adj.getDest()] > dist[curr.getSrc()][curr.getDest()] + adj.getDist()) {
                     dist[curr.getDest()][adj.getDest()] = dist[curr.getSrc()][curr.getDest()] + adj.getDist();
                     pq.add(adj);
