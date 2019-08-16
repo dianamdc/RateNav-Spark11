@@ -26,9 +26,9 @@ public class AdjListGraph {
 
     //node V is the destination
     public AdjListGraph(int V) {
-        this.V = V;
+        this.V = V + 1;
         terminals = new ArrayList<>();
-        for (int i = 0; i < V; i++) {
+        for (int i = 0; i < V + 1; i++) {
             terminals.add(new ArrayList<>());
         }
     }
@@ -45,64 +45,59 @@ public class AdjListGraph {
         return list;
     }
 
-    //dijsktra
-//    public void findShortest() {
-//        int[][] dist = new int[V][V];
-//        Edge[][] pred = new Edge[V][V];
-//
-//        for (int i = 0; i < V; i++) {
-//            for (int j = 0; j < V; j++) {
-//                dist[i][j] = 1_000_000_000;
-//            }
-//        }
-//
-//        dist[0][0] = 0;
-//
-//        PriorityQueue<Edge> pq = new PriorityQueue<>(distComparator);
-//        pq.add(terminals.get(0).get(0));
-//
-//        while (!pq.isEmpty()) {
-//            System.out.println(pq);
-//
-//            Edge curr = pq.poll();
-//            if (curr.getDist() > dist[curr.getSrc()][curr.getDest()]) continue;
-//
-//            //if destination is reached
-//            if (curr.getDest() == V - 1) {
-//                ArrayList<Edge> path = new ArrayList<>();
-//                Edge c = curr;
-//
-//                while (c.getSrc() != 0) {
-//                    c = pred[c.getSrc()][c.getDest()];
-//                    path.add(c);
-//                }
-//
-//                //System.out.println("Shortest path: ");
-//                //for (int i = path.size(); i >= 0; i--) {
-//                //    System.out.print(c.getMode() + " " + path.get(i) + ", ");
-//                // }
-//                System.out.println("\nDistance: " + dist[curr.getSrc()][curr.getDest()]);
-//                //return dist[curr.getSrc()][curr.getDest()];
-//            }
-//
-//            //System.out.println(terminals.get(curr.getDest()));
-//            //for each destination of curr check distance
-//            for (Edge e : terminals.get(curr.getDest())) {
-//                System.out.println(e.getDist());
-//                if (dist[curr.getDest()][e.getDest()] == 1_000_000_000 || dist[curr.getDest()][e.getDest()] > dist[curr.getSrc()][curr.getDest()] + e.getDist()) {
-//
-//                    dist[curr.getDest()][e.getDest()] = dist[curr.getSrc()][curr.getDest()] + e.getDist();
-//                    pred[curr.getDest()][e.getDest()] = curr;
-//                    //System.out.println("uwu");
-//                    pq.add(e);
-//                }
-//            }
-//        }
-//
-//        //return -1;
-//    }
     public void findShortestDistance() {
+        PriorityQueue<Edge> pq = new PriorityQueue(distComparator);
 
+        int dist[][] = new int[V + 5][V + 5];
+        Edge pred[][] = new Edge[V + 5][V + 5];
+
+        for (int i = 0; i < V + 5; i++) {
+            for (int j = 0; j < V + 0; j++) {
+                dist[i][j] = 1_000_000_000;
+            }
+        }
+
+        pq.add(terminals.get(0).get(0));
+        dist[0][0] = 0;
+
+        for (Edge e : terminals.get(0)) {
+            dist[0][e.getDest()] = e.getDist();
+        }
+
+        while (!pq.isEmpty()) {
+            Edge curr = pq.poll();
+            System.out.println(curr.getMode());
+
+            if (curr.getDest() == V - 1) {
+                System.out.println("Found destination.");
+                ArrayList<Edge> path = new ArrayList<>();
+                Edge c = curr;
+                path.add(c);
+                while (c.getSrc() != 0) {
+                    c = pred[c.getSrc()][c.getDest()];
+                    path.add(c);
+                }
+
+                System.out.println("Shortest Path: ");
+                for (int i = path.size() - 1; i >= 0; i--) {
+                    Edge e = path.get(i);
+                    System.out.println("    " + e.getMode() + ", src: " + e.getSrc() + ", dest: " + e.getDest() + ", dist: " + e.getDist());
+                }
+
+                System.out.println("Total Distance: " + dist[curr.getSrc()][curr.getDest()]);
+            }
+
+            if (curr.getDest() > dist[curr.getSrc()][curr.getDest()]) continue;
+
+            for (Edge adj : terminals.get(curr.getDest())) {
+                if (dist[curr.getDest()][adj.getDest()] > dist[curr.getSrc()][curr.getDest()] + adj.getDist()) {
+                    dist[curr.getDest()][adj.getDest()] = dist[curr.getSrc()][curr.getDest()] + adj.getDist();
+                    pq.add(adj);
+                    pred[curr.getDest()][adj.getDest()] = curr;
+                }
+            }
+
+        }
     }
 
     public ArrayList<ArrayList<Edge>> getTerminals() {
