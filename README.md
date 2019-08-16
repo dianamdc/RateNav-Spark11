@@ -1,4 +1,4 @@
-# wfanclub
+# SIP Spark11 Project
 Things to do:
   - add dijkstra for:
       - fare
