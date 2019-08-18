@@ -18,11 +18,11 @@ public class AdjListGraph {
     private int V;
     private ArrayList<ArrayList<Edge>> terminals;
 
-    Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
-    Comparator<Edge> speedComparator = (Edge e1, Edge e2) -> Double.compare(e1.getSpd(), e2.getSpd());
-    Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
-    Comparator<Edge> ratingComparator = (Edge e1, Edge e2) -> -Double.compare(e1.getRating(), e2.getRating());
-    Comparator<Edge> distComparator = (Edge e1, Edge e2) -> Double.compare(e1.getDist(), e2.getDist());
+    static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
+    static Comparator<Edge> speedComparator = (Edge e1, Edge e2) -> Double.compare(e1.getSpd(), e2.getSpd());
+    static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
+    static Comparator<Edge> ratingComparator = (Edge e1, Edge e2) -> -Double.compare(e1.getRating(), e2.getRating());
+    static Comparator<Edge> distComparator = (Edge e1, Edge e2) -> Double.compare(e1.getDist(), e2.getDist());
 
     //node V is the destination
     public AdjListGraph(int V) {
@@ -47,7 +47,15 @@ public class AdjListGraph {
         return list;
     }
 
-    public void findShortestPath(String str) {
+    public ArrayList<ArrayList<Edge>> getTerminals() {
+        return terminals;
+    }
+
+    public int getV() {
+        return V;
+    }
+
+    static public void findShortestPath(String str, ArrayList<ArrayList<Edge>> terminals, int V) {
         PriorityQueue<Edge> pq;
 
         double dist[][] = new double[V + 5][V + 5];
@@ -226,10 +234,6 @@ public class AdjListGraph {
             }
 
         }
-    }
-
-    public ArrayList<ArrayList<Edge>> getTerminals() {
-        return terminals;
     }
 }
 
