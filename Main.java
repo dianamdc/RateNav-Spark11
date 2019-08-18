@@ -27,15 +27,15 @@ public class SamsungProjectPrototype {
         graph.addEdge("bus", 3, 4, 10, 5, 30);
         graph.addEdge("bus", 4, 5, 10, 5, 30);
 
-        graph.findShortestPath("speed");
+        AdjListGraph.findShortestPath("speed", graph.getTerminals(), graph.getV());
         System.out.println();
-        graph.findShortestPath("fare");
+        AdjListGraph.findShortestPath("time", graph.getTerminals(), graph.getV());
         System.out.println();
-        //graph.findShortestPath("rating");
+        //AdjListGraph.findShortestPath("speed", graph.getTerminals(), graph.getV());
         //System.out.println();
-        graph.findShortestPath("time");
+        AdjListGraph.findShortestPath("fare", graph.getTerminals(), graph.getV());
         System.out.println();
-        graph.findShortestPath("distance");
+        AdjListGraph.findShortestPath("distance", graph.getTerminals(), graph.getV());
         //System.out.println(graph.getTerminals());
     }
 
