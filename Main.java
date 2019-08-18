@@ -27,7 +27,7 @@ public class Main {
         graph.addEdge("bus", 3, 4, 10, 5, 30);
         graph.addEdge("bus", 4, 5, 10, 5, 30);
 
-        graph.findShortestDistance("distance");
+        graph.findShortestDistance();
         //System.out.println(graph.getTerminals());
     }
 
