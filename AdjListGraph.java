@@ -61,9 +61,17 @@ public class AdjListGraph {
         double dist[][] = new double[V + 5][V + 5];
         Edge pred[][] = new Edge[V + 5][V + 5];
 
-        for (int i = 0; i < V + 5; i++) {
-            for (int j = 0; j < V + 5; j++) {
-                dist[i][j] = 1_000_000_000;
+        if (str.equals("rating")) {
+            for (int i = 0; i < V + 5; i++) {
+                for (int j = 0; j < V + 5; j++) {
+                    dist[i][j] = -1_000_000_000;
+                }
+            }
+        } else {
+            for (int i = 0; i < V + 5; i++) {
+                for (int j = 0; j < V + 5; j++) {
+                    dist[i][j] = 1_000_000_000;
+                }
             }
         }
 
