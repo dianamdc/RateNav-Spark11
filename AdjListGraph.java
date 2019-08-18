@@ -1,4 +1,5 @@
 
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -6,8 +7,10 @@
  */
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 /**
  *
@@ -19,10 +22,10 @@ public class AdjListGraph {
     private ArrayList<ArrayList<Edge>> terminals;
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
-    static Comparator<Edge> speedComparator = (Edge e1, Edge e2) -> Double.compare(e1.getSpd(), e2.getSpd());
+    static Comparator<Edge> speedComparator = (Edge e1, Edge e2) -> Double.compare(e1.getSpeed(), e2.getSpeed());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
     static Comparator<Edge> ratingComparator = (Edge e1, Edge e2) -> -Double.compare(e1.getRating(), e2.getRating());
-    static Comparator<Edge> distComparator = (Edge e1, Edge e2) -> Double.compare(e1.getDist(), e2.getDist());
+    static Comparator<Edge> distComparator = (Edge e1, Edge e2) -> Double.compare(e1.getDistance(), e2.getDistance());
 
     //node V is the destination
     public AdjListGraph(int V) {
@@ -33,16 +36,16 @@ public class AdjListGraph {
         }
     }
 
-    public void addEdge(String mode, int src, int dest, double fare, double dist, double spd) {
+    public void addEdge(String mode, int src, int dest, double dist, double fare, double spd) {
         //Edge e = new Edge(mode, src, dest, fare, dist, spd);
-        terminals.get(src).add(new Edge(mode, src, dest, fare, dist, spd));
+        terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
         //System.out.println(e.computeTravelTime());
     }
 
     public List<Integer> getAdjacentVertices(int src) {
         List<Integer> list = new ArrayList<>();
         for (Edge x : terminals.get(src)) {
-            list.add(x.getDest());
+            list.add(x.getDestination());
         }
         return list;
     }
@@ -82,7 +85,7 @@ public class AdjListGraph {
             case "speed":
                 pq = new PriorityQueue(speedComparator);
                 for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDest()] = e.getSpd();
+                    dist[0][e.getDestination()] = e.getSpeed();
                     pq.add(e);
                 }
                 break;
@@ -90,7 +93,7 @@ public class AdjListGraph {
             case "fare":
                 pq = new PriorityQueue(fareComparator);
                 for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDest()] = e.getFare();
+                    dist[0][e.getDestination()] = e.getFare();
                     pq.add(e);
                 }
                 break;
@@ -98,7 +101,7 @@ public class AdjListGraph {
             case "rating":
                 pq = new PriorityQueue(ratingComparator);
                 for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDest()] = e.getRating();
+                    dist[0][e.getDestination()] = e.getRating();
                     pq.add(e);
                 }
                 break;
@@ -106,7 +109,7 @@ public class AdjListGraph {
             case "time":
                 pq = new PriorityQueue(timeComparator);
                 for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDest()] = e.computeTravelTime();
+                    dist[0][e.getDestination()] = e.computeTravelTime();
                     //System.out.println(dist[0][e.getDest()]);
                     pq.add(e);
                 }
@@ -116,7 +119,7 @@ public class AdjListGraph {
             default:
                 pq = new PriorityQueue(distComparator);
                 for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDest()] = e.getDist();
+                    dist[0][e.getDestination()] = e.getDistance();
                     pq.add(e);
                 }
                 break;
@@ -126,72 +129,73 @@ public class AdjListGraph {
             Edge curr = pq.poll();
             //System.out.println(curr.getMode());
 
-            if (curr.getDest() == V - 1) {
+            if (curr.getDestination() == V - 1) {
                 System.out.println("Found destination.");
                 ArrayList<Edge> path = new ArrayList<>();
                 Edge c = curr;
                 path.add(c);
-                while (c.getSrc() != 0) {
-                    c = pred[c.getSrc()][c.getDest()];
+                while (c.getSource() != 0) {
+                    c = pred[c.getSource()][c.getDestination()];
                     path.add(c);
                 }
 
                 System.out.println("Shortest Path: ");
                 for (int i = path.size() - 1; i >= 0; i--) {
                     Edge e = path.get(i);
-                    System.out.print("    " + e.getMode() + ", src: " + e.getSrc() + ", dest: " + e.getDest());
+                    System.out.print("    " + e.getMode() + ", src: " + e.getSource() + ", dest: " + e.getDestination());
                     switch (str) {
                         case "speed":
-                            System.out.println(", speed: " + e.getSpd());
+                            System.out.printf(", speed: %.2f%n", e.getSpeed());
                             break;
                         case "fare":
-                            System.out.println(", fare: " + e.getFare());
+                            System.out.printf(", fare: %.2f%n", e.getFare());
                             break;
                         case "rating":
-                            System.out.println(", rating: " + e.getRating());
+                            System.out.printf(", rating: %.2f%n", e.getRating());
                             break;
                         case "time":
-                            System.out.println(", travel time: " + e.computeTravelTime());
+                            System.out.printf(", travel time: %.2f%n", e.computeTravelTime());
                             break;
                         case "distance":
                         default:
-                            System.out.println(", distance: " + e.getDist());
+                            System.out.printf(", distance: %.2f%n", e.getDistance());
                     }
                 }
 
+                double valueToDisplay = dist[curr.getSource()][curr.getDestination()];
+
                 switch (str) {
                     case "speed":
-                        System.out.println("Average speed: " + dist[curr.getSrc()][curr.getDest()] / path.size());
+                        System.out.printf("Average speed: %.2f%n", valueToDisplay / path.size());
                         break;
                     case "fare":
-                        System.out.println("Total fare: " + dist[curr.getSrc()][curr.getDest()] + ".");
+                        System.out.printf("Total fare: %.2f%n", valueToDisplay);
                         break;
                     case "rating":
-                        System.out.println("Average rating: " + dist[curr.getSrc()][curr.getDest()] / path.size());
+                        System.out.printf("Average rating: %.2f%n", valueToDisplay / path.size());
                         break;
                     case "time":
-                        System.out.println("Total travel time: " + dist[curr.getSrc()][curr.getDest()]);
+                        System.out.printf("Total time: %.2f%n", valueToDisplay);
                         break;
                     case "distance":
                     default:
-                        System.out.println("Total distance: " + dist[curr.getSrc()][curr.getDest()] + ".");
+                        System.out.printf("Total distance: %.2f%n", valueToDisplay);
                         break;
                 }
-                //System.out.println("Total Distance: " + dist[curr.getSrc()][curr.getDest()]);
-                break;
+                return;
             }
 
             if (str.equals("rating")) {
-                if (curr.getRating() < dist[curr.getSrc()][curr.getDest()]) continue;
+                if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]) continue;
 
-                for (Edge adj : terminals.get(curr.getDest())) {
+                for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
                     double valueToAdd = adj.getRating();
 
-                    if (dist[curr.getDest()][adj.getDest()] < dist[curr.getSrc()][curr.getDest()] + valueToAdd) {
-                        dist[curr.getDest()][adj.getDest()] = dist[curr.getSrc()][curr.getDest()] + valueToAdd;
+                    if (dist[curr.getDestination()][adj.getDestination()] < dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
+                        dist[curr.getDestination()][adj.getDestination()] = dist[curr.getSource()][curr.getDestination()] + valueToAdd;
                         pq.add(adj);
-                        pred[curr.getDest()][adj.getDest()] = curr;
+                        pred[curr.getDestination()][adj.getDestination()] = curr;
                     }
                 }
 
@@ -199,7 +203,7 @@ public class AdjListGraph {
                 double valueToCompare;
                 switch (str) {
                     case "speed":
-                        valueToCompare = curr.getSpd();
+                        valueToCompare = curr.getSpeed();
                         break;
                     case "fare":
                         valueToCompare = curr.getFare();
@@ -209,18 +213,18 @@ public class AdjListGraph {
                         break;
                     case "distance":
                     default:
-                        valueToCompare = curr.getDist();
+                        valueToCompare = curr.getDistance();
                 }
 
-                if (valueToCompare > dist[curr.getSrc()][curr.getDest()]) continue;
+                if (valueToCompare > dist[curr.getSource()][curr.getDestination()]) continue;
 
-                for (Edge adj : terminals.get(curr.getDest())) {
+                for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
                     double valueToAdd;
 
                     switch (str) {
                         case "speed":
-                            valueToAdd = adj.getSpd();
+                            valueToAdd = adj.getSpeed();
                             break;
                         case "fare":
                             valueToAdd = adj.getFare();
@@ -230,18 +234,20 @@ public class AdjListGraph {
                             break;
                         case "distance":
                         default:
-                            valueToAdd = adj.getDist();
+                            valueToAdd = adj.getDistance();
                     }
 
-                    if (dist[curr.getDest()][adj.getDest()] > dist[curr.getSrc()][curr.getDest()] + valueToAdd) {
-                        dist[curr.getDest()][adj.getDest()] = dist[curr.getSrc()][curr.getDest()] + valueToAdd;
+                    if (dist[curr.getDestination()][adj.getDestination()] > dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
+                        dist[curr.getDestination()][adj.getDestination()] = dist[curr.getSource()][curr.getDestination()] + valueToAdd;
                         pq.add(adj);
-                        pred[curr.getDest()][adj.getDest()] = curr;
+                        pred[curr.getDestination()][adj.getDestination()] = curr;
                     }
                 }
             }
 
         }
+
+        System.out.println("Could not find route to destination.");
     }
 }
 
@@ -250,8 +256,9 @@ class Edge {
     private String mode;
     private int src, dest;
     private double fare, dist, spd, numOfRatings, rating;
+    Set warnings = new HashSet();
 
-    public Edge(String mode, int src, int dest, double fare, double dist, double spd) {
+    public Edge(String mode, int src, int dest, double dist, double fare, double spd) {
         this.mode = mode;
         this.src = src;
         this.dest = dest;
@@ -262,15 +269,15 @@ class Edge {
         rating = -1;
     }
 
-    public int getDest() {
+    public int getDestination() {
         return dest;
     }
 
-    public int getSrc() {
+    public int getSource() {
         return src;
     }
 
-    public double getDist() {
+    public double getDistance() {
         return dist;
     }
 
@@ -282,12 +289,24 @@ class Edge {
         return rating;
     }
 
-    public void setSpd(double spd) {
+    public void setSpeed(double spd) {
         this.spd = spd;
     }
 
-    public double getSpd() {
+    public double getSpeed() {
         return spd;
+    }
+
+    public void addWarning(String str) {
+        warnings.add(str);
+    }
+
+    public void removeWarning(String str) {
+        warnings.remove(str);
+    }
+
+    public Set getWarnings() {
+        return warnings;
     }
 
     public double computeTravelTime() {
@@ -299,8 +318,8 @@ class Edge {
     }
 
     public void setRating(double rating) {
-        numOfRatings++;
-        this.rating = (rating + this.rating) / numOfRatings;
+        //numOfRatings++;
+        this.rating = (rating + this.rating) / ++numOfRatings;
     }
 
 }
