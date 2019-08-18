@@ -58,14 +58,19 @@ public class AdjListGraph {
         return V;
     }
 
-    public ArrayList<Edge> getAllPathsToDestination(int dest) {
+    public boolean alternatePathsPass(int dest, double ratingThreshold) {
         ArrayList<Edge> paths = new ArrayList<>();
+        boolean passes = false;
         for (ArrayList<Edge> a : terminals) {
             for (Edge e : a) {
-                if (e.getDestination() == dest) paths.add(e);
+                if (e.getDestination() == dest) {
+                    paths.add(e);
+                    if (e.getRating() > ratingThreshold) passes = true;
+                }
             }
         }
-        return paths;
+
+        return passes && paths.size() > 1;
     }
 
     static public void findShortestPath(String str, AdjListGraph graph, int V) {
@@ -201,8 +206,7 @@ public class AdjListGraph {
 
             if (str.equals("rating")) {
                 if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]
-                        || (graph.getAllPathsToDestination(curr.getDestination()).size() > 1
-                        && curr.getRating() < ratingThreshold)) continue;
+                        || graph.alternatePathsPass(curr.getDestination(), ratingThreshold)) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
@@ -233,8 +237,7 @@ public class AdjListGraph {
                 }
 
                 if (valueToCompare > dist[curr.getSource()][curr.getDestination()]
-                        || (graph.getAllPathsToDestination(curr.getDestination()).size() > 1
-                        && curr.getRating() < ratingThreshold)) continue;
+                        || graph.alternatePathsPass(curr.getDestination(), ratingThreshold)) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
