@@ -142,24 +142,26 @@ public class AdjListGraph {
                 System.out.println("Shortest Path: ");
                 for (int i = path.size() - 1; i >= 0; i--) {
                     Edge e = path.get(i);
-                    System.out.print("    " + e.getMode() + ", src: " + e.getSource() + ", dest: " + e.getDestination());
+                    System.out.printf("    %-10s src: %2d, dest: %2d", e.getMode(), e.getSource(), e.getDestination());
+                    //System.out.print("    " + e.getMode() + ", src: " + e.getSource() + ", dest: " + e.getDestination());
                     switch (str) {
                         case "speed":
-                            System.out.printf(", speed: %.2f%n", e.getSpeed());
+                            System.out.printf(", speed: %5.2f", e.getSpeed());
                             break;
                         case "fare":
-                            System.out.printf(", fare: %.2f%n", e.getFare());
+                            System.out.printf(", fare: %5.2f", e.getFare());
                             break;
                         case "rating":
-                            System.out.printf(", rating: %.2f%n", e.getRating());
+                            System.out.printf(", rating: %5.2f", e.getRating());
                             break;
                         case "time":
-                            System.out.printf(", travel time: %.2f%n", e.computeTravelTime());
+                            System.out.printf(", travel time: %5.2f", e.computeTravelTime());
                             break;
                         case "distance":
                         default:
-                            System.out.printf(", distance: %.2f%n", e.getDistance());
+                            System.out.printf(", distance: %5.2f", e.getDistance());
                     }
+                    System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
                 }
 
                 double valueToDisplay = dist[curr.getSource()][curr.getDestination()];
@@ -256,7 +258,7 @@ class Edge {
     private String mode;
     private int src, dest;
     private double fare, dist, spd, numOfRatings, rating;
-    Set warnings = new HashSet();
+    private Set warnings = new HashSet();
 
     public Edge(String mode, int src, int dest, double dist, double fare, double spd) {
         this.mode = mode;
