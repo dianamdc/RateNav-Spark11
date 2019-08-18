@@ -58,8 +58,20 @@ public class AdjListGraph {
         return V;
     }
 
-    static public void findShortestPath(String str, ArrayList<ArrayList<Edge>> terminals, int V) {
+    public ArrayList<Edge> getAllPathsToDestination(int dest) {
+        ArrayList<Edge> paths = new ArrayList<>();
+        for (ArrayList<Edge> a : terminals) {
+            for (Edge e : a) {
+                if (e.getDestination() == dest) paths.add(e);
+            }
+        }
+        return paths;
+    }
+
+    static public void findShortestPath(String str, AdjListGraph graph, int V) {
         PriorityQueue<Edge> pq;
+        ArrayList<ArrayList<Edge>> terminals = graph.getTerminals();
+        int ratingThreshold = 6;
 
         double dist[][] = new double[V + 5][V + 5];
         Edge pred[][] = new Edge[V + 5][V + 5];
@@ -188,7 +200,9 @@ public class AdjListGraph {
             }
 
             if (str.equals("rating")) {
-                if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]) continue;
+                if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]
+                        || (graph.getAllPathsToDestination(curr.getDestination()).size() > 1
+                        && curr.getRating() < ratingThreshold)) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
@@ -218,7 +232,9 @@ public class AdjListGraph {
                         valueToCompare = curr.getDistance();
                 }
 
-                if (valueToCompare > dist[curr.getSource()][curr.getDestination()]) continue;
+                if (valueToCompare > dist[curr.getSource()][curr.getDestination()]
+                        || (graph.getAllPathsToDestination(curr.getDestination()).size() > 1
+                        && curr.getRating() < ratingThreshold)) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
