@@ -34,17 +34,19 @@ public class RateNavSpark11Project {
                     graph.addEdge(str, sc.nextInt(), sc.nextInt(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
                 }
 
-                AdjListGraph.findShortestPath("distance", graph.getTerminals(), graph.getV());
+                AdjListGraph.findShortestPath("distance", graph, graph.getV());
                 System.out.println();
-                AdjListGraph.findShortestPath("fare", graph.getTerminals(), graph.getV());
+                AdjListGraph.findShortestPath("fare", graph, graph.getV());
                 System.out.println();
-                AdjListGraph.findShortestPath("speed", graph.getTerminals(), graph.getV());
+                AdjListGraph.findShortestPath("speed", graph, graph.getV());
                 System.out.println();
-                AdjListGraph.findShortestPath("time", graph.getTerminals(), graph.getV());
+                AdjListGraph.findShortestPath("time", graph, graph.getV());
                 System.out.println();
-                AdjListGraph.findShortestPath("rating", graph.getTerminals(), graph.getV());
+                AdjListGraph.findShortestPath("rating", graph, graph.getV());
                 System.out.println();
             }
+
+            sc.close();
 
         } catch (FileNotFoundException ex) {
             System.out.println("File not found.");
