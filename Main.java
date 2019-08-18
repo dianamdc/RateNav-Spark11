@@ -31,12 +31,13 @@ public class SamsungProjectPrototype {
         System.out.println();
         AdjListGraph.findShortestPath("time", graph.getTerminals(), graph.getV());
         System.out.println();
-        //AdjListGraph.findShortestPath("speed", graph.getTerminals(), graph.getV());
-        //System.out.println();
+        AdjListGraph.findShortestPath("rating", graph.getTerminals(), graph.getV());
+        System.out.println();
+        AdjListGraph.findShortestPath("speed", graph.getTerminals(), graph.getV());
+        System.out.println();
         AdjListGraph.findShortestPath("fare", graph.getTerminals(), graph.getV());
         System.out.println();
         AdjListGraph.findShortestPath("distance", graph.getTerminals(), graph.getV());
-        //System.out.println(graph.getTerminals());
     }
 
 }
