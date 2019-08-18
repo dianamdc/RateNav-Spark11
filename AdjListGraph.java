@@ -1,4 +1,5 @@
 
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -44,23 +45,8 @@ public class AdjListGraph {
         return list;
     }
 
-    public void findShortestPath(String str) {
-        PriorityQueue<Edge> pq;
-        switch (str) {
-            case "speed":
-                pq = new PriorityQueue(speedComparator);
-                break;
-            case "fare":
-                pq = new PriorityQueue(fareComparator);
-                break;
-            case "rating":
-                pq = new PriorityQueue(ratingComparator);
-                break;
-            case "distance":
-            default:
-                pq = new PriorityQueue(distComparator);
-                break;
-        }
+    public void findShortestDistance() {
+        PriorityQueue<Edge> pq = new PriorityQueue(distComparator);
 
         int dist[][] = new int[V + 5][V + 5];
         Edge pred[][] = new Edge[V + 5][V + 5];
@@ -99,22 +85,7 @@ public class AdjListGraph {
                     System.out.println("    " + e.getMode() + ", src: " + e.getSrc() + ", dest: " + e.getDest() + ", dist: " + e.getDist());
                 }
 
-                switch (str) {
-                    case "speed":
-                        System.out.println("Average speed: " + dist[curr.getSrc()][curr.getDest()] / path.size());
-                        break;
-                    case "fare":
-                        System.out.println("Total fare: " + dist[curr.getSrc()][curr.getDest()] + ".");
-                        break;
-                    case "rating":
-                        System.out.println("Average rating: " + dist[curr.getSrc()][curr.getDest()] / path.size());
-                        break;
-                    case "distance":
-                    default:
-                        System.out.println("Total distance: " + dist[curr.getSrc()][curr.getDest()] + ".");
-                        break;
-                }
-                //System.out.println("Total Distance: " + dist[curr.getSrc()][curr.getDest()]);
+                System.out.println("Total Distance: " + dist[curr.getSrc()][curr.getDest()]);
                 break;
             }
 
