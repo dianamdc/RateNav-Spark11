@@ -3,4 +3,4 @@ Things to do:
   - create test data
   - add warnings
   - add number of passengers
-  - clean and siplify code
+  - clean and simplify code
