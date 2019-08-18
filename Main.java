@@ -8,7 +8,7 @@
  *
  * @author diana
  */
-public class Main {
+public class SamsungProjectPrototype {
 
     /**
      * @param args the command line arguments
@@ -22,12 +22,20 @@ public class Main {
         graph.addEdge("tricycle", 1, 2, 10, 3, 30);
         graph.addEdge("bus", 1, 2, 10, 10, 30);
         //graph.addEdge("train", 2, 1, 20, 5, 30);
-        graph.addEdge("fx", 2, 3, 34, 12, 30);
-        graph.addEdge("fx", 2, 5, 34, 50, 30);
+        graph.addEdge("uv", 2, 3, 34, 12, 30);
+        graph.addEdge("uv", 2, 5, 34, 50, 30);
         graph.addEdge("bus", 3, 4, 10, 5, 30);
         graph.addEdge("bus", 4, 5, 10, 5, 30);
 
-        graph.findShortestDistance();
+        graph.findShortestPath("speed");
+        System.out.println();
+        graph.findShortestPath("fare");
+        System.out.println();
+        //graph.findShortestPath("rating");
+        //System.out.println();
+        graph.findShortestPath("time");
+        System.out.println();
+        graph.findShortestPath("distance");
         //System.out.println(graph.getTerminals());
     }
 
