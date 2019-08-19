@@ -20,9 +20,10 @@ public class AdjListGraph {
 
     private int V;
     private ArrayList<ArrayList<Edge>> terminals;
+    private boolean[] hasAlternatePaths;
+    private double ratingThreshold;
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
-    static Comparator<Edge> speedComparator = (Edge e1, Edge e2) -> Double.compare(e1.getSpeed(), e2.getSpeed());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
     static Comparator<Edge> ratingComparator = (Edge e1, Edge e2) -> -Double.compare(e1.getRating(), e2.getRating());
     static Comparator<Edge> distComparator = (Edge e1, Edge e2) -> Double.compare(e1.getDistance(), e2.getDistance());
@@ -33,6 +34,15 @@ public class AdjListGraph {
         terminals = new ArrayList<>();
         for (int i = 0; i < V + 1; i++) {
             terminals.add(new ArrayList<>());
+        }
+        hasAlternatePaths = new boolean[V + 5];
+        ratingThreshold = 0;
+    }
+
+    public void setRatingThreshold(double rate) {
+        ratingThreshold = rate;
+        for (int i = 0; i < V; i++) {
+            this.alternatePathsPass(i, ratingThreshold);
         }
     }
 
@@ -59,18 +69,19 @@ public class AdjListGraph {
     }
 
     public boolean alternatePathsPass(int dest, double ratingThreshold) {
-        ArrayList<Edge> paths = new ArrayList<>();
+        int pathsNum = 0;
         boolean passes = false;
         for (ArrayList<Edge> a : terminals) {
             for (Edge e : a) {
                 if (e.getDestination() == dest) {
-                    paths.add(e);
-                    if (e.getRating() > ratingThreshold) passes = true;
+                    pathsNum++;
+                    if (e.getRating() >= ratingThreshold)
+                        if (pathsNum > 1) return true;
                 }
             }
         }
 
-        return passes && paths.size() > 1;
+        return false;
     }
 
     static public void findShortestPath(String str, AdjListGraph graph, int V) {
@@ -99,13 +110,6 @@ public class AdjListGraph {
         dist[0][0] = 0;
 
         switch (str) {
-            case "speed":
-                pq = new PriorityQueue(speedComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.getSpeed();
-                    pq.add(e);
-                }
-                break;
 
             case "fare":
                 pq = new PriorityQueue(fareComparator);
@@ -127,7 +131,6 @@ public class AdjListGraph {
                 pq = new PriorityQueue(timeComparator);
                 for (Edge e : terminals.get(0)) {
                     dist[0][e.getDestination()] = e.computeTravelTime();
-                    //System.out.println(dist[0][e.getDest()]);
                     pq.add(e);
                 }
                 break;
@@ -137,6 +140,7 @@ public class AdjListGraph {
                 pq = new PriorityQueue(distComparator);
                 for (Edge e : terminals.get(0)) {
                     dist[0][e.getDestination()] = e.getDistance();
+                    //System.out.println(dist[0][e.getDestination()]);
                     pq.add(e);
                 }
                 break;
@@ -149,6 +153,7 @@ public class AdjListGraph {
             if (curr.getDestination() == V - 1) {
                 System.out.println("Found destination.");
                 ArrayList<Edge> path = new ArrayList<>();
+                double[] values = new double[5];
                 Edge c = curr;
                 path.add(c);
                 while (c.getSource() != 0) {
@@ -156,57 +161,48 @@ public class AdjListGraph {
                     path.add(c);
                 }
 
-                System.out.println("Shortest Path: ");
+                switch (str) {
+                    case "fare":
+                        System.out.println("Cheapest Path: ");
+                        break;
+                    case "rating":
+                        System.out.println("Best Rated Path: ");
+                        break;
+                    case "time":
+                        System.out.println("Fastest(time) Path: ");
+                        break;
+                    case "distance":
+                    default:
+                        System.out.println("Shortest Path: ");
+                }
+
                 for (int i = path.size() - 1; i >= 0; i--) {
                     Edge e = path.get(i);
-                    System.out.printf("    %-10s src: %2d, dest: %2d", e.getMode(), e.getSource(), e.getDestination());
-                    //System.out.print("    " + e.getMode() + ", src: " + e.getSource() + ", dest: " + e.getDestination());
-                    switch (str) {
-                        case "speed":
-                            System.out.printf(", speed: %5.2f", e.getSpeed());
-                            break;
-                        case "fare":
-                            System.out.printf(", fare: %5.2f", e.getFare());
-                            break;
-                        case "rating":
-                            System.out.printf(", rating: %5.2f", e.getRating());
-                            break;
-                        case "time":
-                            System.out.printf(", travel time: %5.2f", e.computeTravelTime());
-                            break;
-                        case "distance":
-                        default:
-                            System.out.printf(", distance: %5.2f", e.getDistance());
-                    }
+                    values[0] += e.getSpeed();
+                    values[1] += e.getDistance();
+                    values[2] += e.computeTravelTime();
+                    values[3] += e.getFare();
+                    values[4] += e.getRating();
+                    System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                            e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                     System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
                 }
 
                 double valueToDisplay = dist[curr.getSource()][curr.getDestination()];
 
-                switch (str) {
-                    case "speed":
-                        System.out.printf("Average speed: %.2f%n", valueToDisplay / path.size());
-                        break;
-                    case "fare":
-                        System.out.printf("Total fare: %.2f%n", valueToDisplay);
-                        break;
-                    case "rating":
-                        System.out.printf("Average rating: %.2f%n", valueToDisplay / path.size());
-                        break;
-                    case "time":
-                        System.out.printf("Total time: %.2f%n", valueToDisplay);
-                        break;
-                    case "distance":
-                    default:
-                        System.out.printf("Total distance: %.2f%n", valueToDisplay);
-                        break;
-                }
+                System.out.printf("Total distance: %6.2f%n", values[1]);
+                System.out.printf("Total time:     %6.2f%n", values[2]);
+                System.out.printf("Total fare:     %6.2f%n", values[3]);
+                System.out.printf("Average rating: %6.2f%n", values[4] / path.size());
+                System.out.println(valueToDisplay);
+
                 return;
             }
 
             if (str.equals("rating")) {
-                if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]
-                        || graph.alternatePathsPass(curr.getDestination(), ratingThreshold)) continue;
+                //only include paths with ratings already
+                if (curr.getNumberOfRatings() == 0 || curr.getRating() < dist[curr.getSource()][curr.getDestination()]
+                        || graph.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
@@ -222,9 +218,6 @@ public class AdjListGraph {
             } else {
                 double valueToCompare;
                 switch (str) {
-                    case "speed":
-                        valueToCompare = curr.getSpeed();
-                        break;
                     case "fare":
                         valueToCompare = curr.getFare();
                         break;
@@ -237,7 +230,7 @@ public class AdjListGraph {
                 }
 
                 if (valueToCompare > dist[curr.getSource()][curr.getDestination()]
-                        || graph.alternatePathsPass(curr.getDestination(), ratingThreshold)) continue;
+                        || graph.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
@@ -270,13 +263,14 @@ public class AdjListGraph {
 
         System.out.println("Could not find route to destination.");
     }
+
 }
 
 class Edge {
 
     private String mode;
-    private int src, dest;
-    private double fare, dist, spd, numOfRatings, rating;
+    private int src, dest, numOfRatings;
+    private double fare, dist, spd, rating;
     private Set warnings = new HashSet();
 
     public Edge(String mode, int src, int dest, double dist, double fare, double spd) {
@@ -287,7 +281,8 @@ class Edge {
         this.dist = dist;
         this.spd = spd;
         numOfRatings = 0;
-        rating = -1;
+        rating = 0;
+        warnings.add("No ratings yet.");
     }
 
     public int getDestination() {
@@ -338,8 +333,13 @@ class Edge {
         return mode;
     }
 
+    public int getNumberOfRatings() {
+        return numOfRatings;
+    }
+
     public void setRating(double rating) {
         //numOfRatings++;
+        if (numOfRatings == 0) warnings.remove("No ratings yet.");
         this.rating = (rating + this.rating) / ++numOfRatings;
     }
 
