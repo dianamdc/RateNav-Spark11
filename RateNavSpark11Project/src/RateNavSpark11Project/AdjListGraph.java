@@ -146,57 +146,16 @@ public class AdjListGraph {
                 break;
         }
 
+        Edge min = new Edge("none", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
+
         while (!pq.isEmpty()) {
             Edge curr = pq.poll();
             //System.out.println(curr.getMode());
 
             if (curr.getDestination() == V - 1) {
-                System.out.println("Found destination.");
-                ArrayList<Edge> path = new ArrayList<>();
-                double[] values = new double[5];
-                Edge c = curr;
-                path.add(c);
-                while (c.getSource() != 0) {
-                    c = pred[c.getSource()][c.getDestination()];
-                    path.add(c);
-                }
-
-                switch (str) {
-                    case "fare":
-                        System.out.println("Cheapest Path: ");
-                        break;
-                    case "rating":
-                        System.out.println("Best Rated Path: ");
-                        break;
-                    case "time":
-                        System.out.println("Fastest(time) Path: ");
-                        break;
-                    case "distance":
-                    default:
-                        System.out.println("Shortest Path: ");
-                }
-
-                for (int i = path.size() - 1; i >= 0; i--) {
-                    Edge e = path.get(i);
-                    values[0] += e.getSpeed();
-                    values[1] += e.getDistance();
-                    values[2] += e.computeTravelTime();
-                    values[3] += e.getFare();
-                    values[4] += e.getRating();
-                    System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
-                            e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
-                    System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
-                }
-
-                double valueToDisplay = dist[curr.getSource()][curr.getDestination()];
-
-                System.out.printf("Total distance: %6.2f%n", values[1]);
-                System.out.printf("Total time:     %6.2f%n", values[2]);
-                System.out.printf("Total fare:     %6.2f%n", values[3]);
-                System.out.printf("Average rating: %6.2f%n", values[4] / path.size());
-                System.out.println(valueToDisplay);
-
-                return;
+                if (dist[min.getSource()][min.getDestination()] >= dist[curr.getSource()][curr.getDestination()])
+                    min = curr;
+                continue;
             }
 
             if (str.equals("rating")) {
@@ -258,7 +217,54 @@ public class AdjListGraph {
                     }
                 }
             }
+        }
 
+        if (!min.getMode().equals("none")) {
+            System.out.println("Found destination.");
+            ArrayList<Edge> path = new ArrayList<>();
+            double[] values = new double[5];
+            Edge c = min;
+            path.add(c);
+            while (c.getSource() != 0) {
+                c = pred[c.getSource()][c.getDestination()];
+                path.add(c);
+            }
+
+            switch (str) {
+                case "fare":
+                    System.out.println("Cheapest Path: ");
+                    break;
+                case "rating":
+                    System.out.println("Best Rated Path: ");
+                    break;
+                case "time":
+                    System.out.println("Fastest(time) Path: ");
+                    break;
+                case "distance":
+                default:
+                    System.out.println("Shortest Path: ");
+            }
+
+            for (int i = path.size() - 1; i >= 0; i--) {
+                Edge e = path.get(i);
+                values[0] += e.getSpeed();
+                values[1] += e.getDistance();
+                values[2] += e.computeTravelTime();
+                values[3] += e.getFare();
+                values[4] += e.getRating();
+                System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                        e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
+                System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
+            }
+
+            //double valueToDisplay = dist[min.getSource()][min.getDestination()];
+            System.out.printf("Total distance: %6.2f%n", values[1]);
+            System.out.printf("Total time:     %6.2f%n", values[2]);
+            System.out.printf("Total fare:     %6.2f%n", values[3]);
+            System.out.printf("Average rating: %6.2f%n", values[4] / path.size());
+            //System.out.println(valueToDisplay);
+
+            return;
         }
 
         System.out.println("Could not find route to destination.");
