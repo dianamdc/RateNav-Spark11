@@ -38,7 +38,7 @@ public class RateNavSpark11Project {
                 System.out.println();
                 AdjListGraph.findShortestPath("fare", graph, graph.getV());
                 System.out.println();
-                AdjListGraph.findShortestPath("speed", graph, graph.getV());
+                AdjListGraph.findShortestPath("x", graph, graph.getV());
                 System.out.println();
                 AdjListGraph.findShortestPath("time", graph, graph.getV());
                 System.out.println();
