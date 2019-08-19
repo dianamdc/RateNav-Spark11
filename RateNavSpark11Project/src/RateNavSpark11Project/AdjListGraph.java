@@ -127,20 +127,20 @@ public class AdjListGraph {
                 }
                 break;
 
-            case "time":
-                pq = new PriorityQueue(timeComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.computeTravelTime();
-                    pq.add(e);
-                }
-                break;
-
             case "distance":
-            default:
                 pq = new PriorityQueue(distComparator);
                 for (Edge e : terminals.get(0)) {
                     dist[0][e.getDestination()] = e.getDistance();
                     //System.out.println(dist[0][e.getDestination()]);
+                    pq.add(e);
+                }
+                break;
+
+            case "time":
+            default:
+                pq = new PriorityQueue(timeComparator);
+                for (Edge e : terminals.get(0)) {
+                    dist[0][e.getDestination()] = e.computeTravelTime();
                     pq.add(e);
                 }
                 break;
@@ -180,12 +180,13 @@ public class AdjListGraph {
                     case "fare":
                         valueToCompare = curr.getFare();
                         break;
+                    case "distance":
+                        valueToCompare = curr.getDistance();
+                        break;
                     case "time":
+                    default:
                         valueToCompare = curr.computeTravelTime();
                         break;
-                    case "distance":
-                    default:
-                        valueToCompare = curr.getDistance();
                 }
 
                 if (valueToCompare > dist[curr.getSource()][curr.getDestination()]
@@ -202,12 +203,13 @@ public class AdjListGraph {
                         case "fare":
                             valueToAdd = adj.getFare();
                             break;
+                        case "distance":
+                            valueToAdd = adj.getDistance();
+                            break;
                         case "time":
+                        default:
                             valueToAdd = adj.computeTravelTime();
                             break;
-                        case "distance":
-                        default:
-                            valueToAdd = adj.getDistance();
                     }
 
                     if (dist[curr.getDestination()][adj.getDestination()] > dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
@@ -237,12 +239,13 @@ public class AdjListGraph {
                 case "rating":
                     System.out.println("Best Rated Path: ");
                     break;
+                case "distance":
+                    System.out.println("Shortest Path: ");
+                    break;
                 case "time":
+                default:
                     System.out.println("Fastest(time) Path: ");
                     break;
-                case "distance":
-                default:
-                    System.out.println("Shortest Path: ");
             }
 
             for (int i = path.size() - 1; i >= 0; i--) {
@@ -252,8 +255,8 @@ public class AdjListGraph {
                 values[2] += e.computeTravelTime();
                 values[3] += e.getFare();
                 values[4] += e.getRating();
-                System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
-                        e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
+                System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                        e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                 System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
             }
 
