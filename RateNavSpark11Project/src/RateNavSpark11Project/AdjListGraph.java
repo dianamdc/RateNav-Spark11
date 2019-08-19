@@ -22,6 +22,7 @@ public class AdjListGraph {
     private ArrayList<ArrayList<Edge>> terminals;
     private boolean[] hasAlternatePaths;
     private double ratingThreshold;
+    private String terminalNames[];
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
@@ -30,9 +31,10 @@ public class AdjListGraph {
 
     //node V is the destination
     public AdjListGraph(int V) {
-        this.V = V + 1;
+        this.V = V;
         terminals = new ArrayList<>();
-        for (int i = 0; i < V + 1; i++) {
+        terminalNames = new String[V];
+        for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
         }
         hasAlternatePaths = new boolean[V + 5];
@@ -64,6 +66,18 @@ public class AdjListGraph {
         return terminals;
     }
 
+    public String[] getTerminalNames() {
+        return terminalNames;
+    }
+
+    public void setTerminalNames(String[] t) {
+        this.terminalNames = t;
+    }
+
+    public void setTerminalName(String t, int i) {
+        this.terminalNames[i] = t;
+    }
+
     public int getV() {
         return V;
     }
@@ -84,10 +98,8 @@ public class AdjListGraph {
         return false;
     }
 
-    static public void findShortestPath(String str, AdjListGraph graph, int V) {
+    public void findShortestPath(String str, int src, int dest) {
         PriorityQueue<Edge> pq;
-        ArrayList<ArrayList<Edge>> terminals = graph.getTerminals();
-        int ratingThreshold = 6;
 
         double dist[][] = new double[V + 5][V + 5];
         Edge pred[][] = new Edge[V + 5][V + 5];
@@ -113,24 +125,24 @@ public class AdjListGraph {
 
             case "fare":
                 pq = new PriorityQueue(fareComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.getFare();
+                for (Edge e : terminals.get(src)) {
+                    dist[src][e.getDestination()] = e.getFare();
                     pq.add(e);
                 }
                 break;
 
             case "rating":
                 pq = new PriorityQueue(ratingComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.getRating();
+                for (Edge e : terminals.get(src)) {
+                    dist[src][e.getDestination()] = e.getRating();
                     pq.add(e);
                 }
                 break;
 
             case "distance":
                 pq = new PriorityQueue(distComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.getDistance();
+                for (Edge e : terminals.get(src)) {
+                    dist[src][e.getDestination()] = e.getDistance();
                     //System.out.println(dist[0][e.getDestination()]);
                     pq.add(e);
                 }
@@ -139,8 +151,8 @@ public class AdjListGraph {
             case "time":
             default:
                 pq = new PriorityQueue(timeComparator);
-                for (Edge e : terminals.get(0)) {
-                    dist[0][e.getDestination()] = e.computeTravelTime();
+                for (Edge e : terminals.get(src)) {
+                    dist[src][e.getDestination()] = e.computeTravelTime();
                     pq.add(e);
                 }
                 break;
@@ -152,7 +164,7 @@ public class AdjListGraph {
             Edge curr = pq.poll();
             //System.out.println(curr.getMode());
 
-            if (curr.getDestination() == V - 1) {
+            if (curr.getDestination() == dest) {
                 if (dist[min.getSource()][min.getDestination()] >= dist[curr.getSource()][curr.getDestination()])
                     min = curr;
                 continue;
@@ -161,7 +173,7 @@ public class AdjListGraph {
             if (str.equals("rating")) {
                 //only include paths with ratings already
                 if (curr.getNumberOfRatings() == 0 || curr.getRating() < dist[curr.getSource()][curr.getDestination()]
-                        || graph.hasAlternatePaths[curr.getDestination()]) continue;
+                        || this.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
@@ -190,16 +202,13 @@ public class AdjListGraph {
                 }
 
                 if (valueToCompare > dist[curr.getSource()][curr.getDestination()]
-                        || graph.hasAlternatePaths[curr.getDestination()]) continue;
+                        || this.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     //System.out.println(dist[curr.getDest()][adj.getDest()]);
                     double valueToAdd;
 
                     switch (str) {
-                        case "speed":
-                            valueToAdd = adj.getSpeed();
-                            break;
                         case "fare":
                             valueToAdd = adj.getFare();
                             break;
@@ -227,26 +236,28 @@ public class AdjListGraph {
             double[] values = new double[5];
             Edge c = min;
             path.add(c);
-            while (c.getSource() != 0) {
+            while (c.getSource() != src) {
                 c = pred[c.getSource()][c.getDestination()];
                 path.add(c);
             }
 
             switch (str) {
                 case "fare":
-                    System.out.println("Cheapest Path: ");
+                    System.out.print("Cheapest Path");
                     break;
                 case "rating":
-                    System.out.println("Best Rated Path: ");
+                    System.out.print("Best Rated Path");
                     break;
                 case "distance":
-                    System.out.println("Shortest Path: ");
+                    System.out.print("Shortest Path");
                     break;
                 case "time":
                 default:
-                    System.out.println("Fastest(time) Path: ");
+                    System.out.print("Fastest Path");
                     break;
             }
+
+            System.out.println("from " + terminalNames[src] + " to " + terminalNames[dest] + ": ");
 
             for (int i = path.size() - 1; i >= 0; i--) {
                 Edge e = path.get(i);
@@ -255,8 +266,8 @@ public class AdjListGraph {
                 values[2] += e.computeTravelTime();
                 values[3] += e.getFare();
                 values[4] += e.getRating();
-                System.out.printf("    %-10s src: %2d, dest: %2d, distance: %5.2f, speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
-                        e.getMode(), e.getSource(), e.getDestination(), e.getDistance(), e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
+                System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f, speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                        e.getMode(), terminalNames[e.getSource()], terminalNames[e.getDestination()], e.getDistance(), e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                 System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
             }
 
