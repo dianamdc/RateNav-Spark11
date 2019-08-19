@@ -1,7 +1,9 @@
 # SIP RateNav Spark11 Project
 Things to do:
   - create better test data
-  - aadd option to print all paths using dfs
-  - add number of passengers
+  - comments
+  - preferred mode of transpo
+  - add option to print all paths using dfs
   - think of name
   - clean and simplify code
+  - ppt
