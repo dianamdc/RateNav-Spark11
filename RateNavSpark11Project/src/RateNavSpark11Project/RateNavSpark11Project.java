@@ -7,6 +7,7 @@ package RateNavSpark11Project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -19,7 +20,7 @@ public class RateNavSpark11Project {
     /**
      * @param args the command line arguments
      */
-    static String[] terminals = {"a", "b", "c", "d", "e", "f"};
+    static ArrayList<String> terminals = new ArrayList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
 
     public static void main(String[] args) {
         try {

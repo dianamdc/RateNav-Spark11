@@ -18,11 +18,12 @@ import java.util.Set;
  */
 public class AdjListGraph {
 
-    private int V;
+    private int V; //num of vertices
     private ArrayList<ArrayList<Edge>> terminals;
     private boolean[] hasAlternatePaths;
     private double ratingThreshold;
-    private String terminalNames[];
+    private ArrayList<String> terminalNames;
+    private int[] pathsToDest; //number of paths going to a destination of index i
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
@@ -33,14 +34,16 @@ public class AdjListGraph {
     public AdjListGraph(int V) {
         this.V = V;
         terminals = new ArrayList<>();
-        terminalNames = new String[V];
+        terminalNames = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
         }
         hasAlternatePaths = new boolean[V + 5];
         ratingThreshold = 0;
+        pathsToDest = new int[V];
     }
 
+    //if a certain path has a value lower than the rating threshold, it is avoided
     public void setRatingThreshold(double rate) {
         ratingThreshold = rate;
         for (int i = 0; i < V; i++) {
@@ -49,9 +52,19 @@ public class AdjListGraph {
     }
 
     public void addEdge(String mode, int src, int dest, double dist, double fare, double spd) {
-        //Edge e = new Edge(mode, src, dest, fare, dist, spd);
         terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
-        //System.out.println(e.computeTravelTime());
+        pathsToDest[dest] += 1;
+    }
+
+    public void addEdge(String mode, String src, String dest, double dist, double fare, double spd) {
+        int dest_i = terminalNames.indexOf(dest);
+        int src_i = terminalNames.indexOf(src);
+        if (dest_i == -1 || src_i == -1) {
+            System.out.println("Terminal does not exist.");
+            return;
+        }
+        terminals.get(src_i).add(new Edge(mode, src_i, dest_i, dist, fare, spd));
+        pathsToDest[dest_i] += 1;
     }
 
     public List<Integer> getAdjacentVertices(int src) {
@@ -66,22 +79,23 @@ public class AdjListGraph {
         return terminals;
     }
 
-    public String[] getTerminalNames() {
+    public ArrayList<String> getTerminalNames() {
         return terminalNames;
     }
 
-    public void setTerminalNames(String[] t) {
+    public void setTerminalNames(ArrayList<String> t) {
         this.terminalNames = t;
     }
 
     public void setTerminalName(String t, int i) {
-        this.terminalNames[i] = t;
+        this.terminalNames.add(i, t);
     }
 
     public int getV() {
         return V;
     }
 
+    //checks if there are alternative paths to the destination that passes the rating threshold
     public boolean alternatePathsPass(int dest, double ratingThreshold) {
         int pathsNum = 0;
         boolean passes = false;
@@ -98,6 +112,7 @@ public class AdjListGraph {
         return false;
     }
 
+    //dijkstra
     public void findShortestPath(String str, int src, int dest) {
         PriorityQueue<Edge> pq;
 
@@ -118,9 +133,9 @@ public class AdjListGraph {
             }
         }
 
-        //pq.add(terminals.get(0).get(0));
         dist[0][0] = 0;
 
+        //initializes pq with all paths coming from src
         switch (str) {
 
             case "fare":
@@ -158,7 +173,11 @@ public class AdjListGraph {
                 break;
         }
 
+        //edge going to destination that has the lowest distance
+        //makes sure that all other paths have been exhausted first and pq is empty
+        //saves the edge so that it can be accessed outside the loop
         Edge min = new Edge("none", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
+        int countToDest = 0;
 
         while (!pq.isEmpty()) {
             Edge curr = pq.poll();
@@ -167,16 +186,21 @@ public class AdjListGraph {
             if (curr.getDestination() == dest) {
                 if (dist[min.getSource()][min.getDestination()] >= dist[curr.getSource()][curr.getDestination()])
                     min = curr;
+                countToDest++;
+
+                //if all paths going to destination have been visited, loop terminates
+                if (countToDest == pathsToDest[dest]) break;
                 continue;
             }
 
+            //main dijksra algos
+            //only includes paths with ratings already
+            //is separated because rating looks for the highest ratings while the others looks for the lowest values
             if (str.equals("rating")) {
-                //only include paths with ratings already
                 if (curr.getNumberOfRatings() == 0 || curr.getRating() < dist[curr.getSource()][curr.getDestination()]
                         || this.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
-                    //System.out.println(dist[curr.getDest()][adj.getDest()]);
                     double valueToAdd = adj.getRating();
 
                     if (dist[curr.getDestination()][adj.getDestination()] < dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
@@ -205,7 +229,6 @@ public class AdjListGraph {
                         || this.hasAlternatePaths[curr.getDestination()]) continue;
 
                 for (Edge adj : terminals.get(curr.getDestination())) {
-                    //System.out.println(dist[curr.getDest()][adj.getDest()]);
                     double valueToAdd;
 
                     switch (str) {
@@ -234,6 +257,8 @@ public class AdjListGraph {
             System.out.println("Found destination.");
             ArrayList<Edge> path = new ArrayList<>();
             double[] values = new double[5];
+
+            //gets the overall path
             Edge c = min;
             path.add(c);
             while (c.getSource() != src) {
@@ -257,8 +282,9 @@ public class AdjListGraph {
                     break;
             }
 
-            System.out.println("from " + terminalNames[src] + " to " + terminalNames[dest] + ": ");
+            System.out.println("from " + terminalNames.get(src) + " to " + terminalNames.get(dest) + ": ");
 
+            //prints all the values for each path visited
             for (int i = path.size() - 1; i >= 0; i--) {
                 Edge e = path.get(i);
                 values[0] += e.getSpeed();
@@ -266,17 +292,18 @@ public class AdjListGraph {
                 values[2] += e.computeTravelTime();
                 values[3] += e.getFare();
                 values[4] += e.getRating();
-                System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f, speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
-                        e.getMode(), terminalNames[e.getSource()], terminalNames[e.getDestination()], e.getDistance(), e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
+                System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f, "
+                        + "speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                        e.getMode(), terminalNames.get(e.getSource()), terminalNames.get(e.getDestination()), e.getDistance(),
+                        e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                 System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
             }
 
-            //double valueToDisplay = dist[min.getSource()][min.getDestination()];
+            //prints all the total values
             System.out.printf("Total distance: %6.2f%n", values[1]);
             System.out.printf("Total time:     %6.2f%n", values[2]);
             System.out.printf("Total fare:     %6.2f%n", values[3]);
             System.out.printf("Average rating: %6.2f%n", values[4] / path.size());
-            //System.out.println(valueToDisplay);
 
             return;
         }
@@ -358,7 +385,6 @@ class Edge {
     }
 
     public void setRating(double rating) {
-        //numOfRatings++;
         if (numOfRatings == 0) warnings.remove("No ratings yet.");
         this.rating = (rating + this.rating) / ++numOfRatings;
     }
