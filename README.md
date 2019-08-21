@@ -5,5 +5,5 @@ Things to do:
   - preferred mode of transpo
   - add option to print all paths using dfs
   - think of name
-  - clean and simplify code
+  - organize code
   - ppt
