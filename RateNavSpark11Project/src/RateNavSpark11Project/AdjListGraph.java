@@ -24,8 +24,7 @@ public class AdjListGraph {
     private double ratingThreshold;
     private ArrayList<String> terminalNames;
     private int[] pathsToDest; //number of paths going to a destination of index i
-    //private HashMap<String, boolean[]> hasPrefMode;
-    private ArrayList<Set<String>> hasPrefMode;
+    //private ArrayList<Set<String>> hasPrefMode; //checks if there is a
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
@@ -37,10 +36,10 @@ public class AdjListGraph {
         this.V = V;
         terminals = new ArrayList<>();
         terminalNames = new ArrayList<>();
-        hasPrefMode = new ArrayList<>();
+        //hasPrefMode = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
-            hasPrefMode.add(new HashSet<>());
+            //hasPrefMode.add(new HashSet<>());
         }
         hasAlternatePaths = new boolean[V + 5];
         ratingThreshold = 0;
@@ -59,7 +58,7 @@ public class AdjListGraph {
         terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
         pathsToDest[dest] += 1;
 
-        if (!hasPrefMode.get(dest).contains(mode)) hasPrefMode.get(dest).add(mode);
+        //if (!hasPrefMode.get(dest).contains(mode)) hasPrefMode.get(dest).add(mode);
     }
 
     public void addEdge(String mode, String src, String dest, double dist, double fare, double spd) {
@@ -119,7 +118,7 @@ public class AdjListGraph {
     }
 
     //dijkstra
-    public void findShortestPath(String str, int src, int dest, String prefMode) {
+    public void findShortestPath(String str, int src, int dest) {
         PriorityQueue<Edge> pq;
 
         double dist[][] = new double[V + 5][V + 5];
@@ -199,8 +198,7 @@ public class AdjListGraph {
                 continue;
             }
 
-            if (!curr.getMode().equals(prefMode) && hasPrefMode.get(dest).contains(prefMode)) continue;
-
+            //if (!curr.getMode().equals(prefMode) && hasPrefMode.get(dest).contains(prefMode)) continue;
             //main dijksra algos
             //only includes paths with ratings already
             //is separated because rating looks for the highest ratings while the others looks for the lowest values
