@@ -42,15 +42,15 @@ public class RateNavSpark11Project {
                 graph.getTerminals().get(0).get(0).setRating(10);
                 graph.setTerminalNames(terminals);
 
-                graph.findShortestPath("distance", 1, 4);
+                graph.findShortestPath("distance", 1, 4, "none");
                 System.out.println();
-                graph.findShortestPath("fare", 0, 5);
+                graph.findShortestPath("fare", 0, 5, "none");
                 System.out.println();
-                graph.findShortestPath("x", 0, 5);
+                graph.findShortestPath("x", 0, 5, "none");
                 System.out.println();
-                graph.findShortestPath("time", 0, 5);
+                graph.findShortestPath("time", 0, 5, "none");
                 System.out.println();
-                graph.findShortestPath("rating", 0, 5);
+                graph.findShortestPath("rating", 0, 5, "none");
                 System.out.println();
             }
 

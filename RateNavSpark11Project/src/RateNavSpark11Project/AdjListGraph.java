@@ -24,6 +24,8 @@ public class AdjListGraph {
     private double ratingThreshold;
     private ArrayList<String> terminalNames;
     private int[] pathsToDest; //number of paths going to a destination of index i
+    //private HashMap<String, boolean[]> hasPrefMode;
+    private ArrayList<Set<String>> hasPrefMode;
 
     static Comparator<Edge> timeComparator = (Edge e1, Edge e2) -> Double.compare(e1.computeTravelTime(), e2.computeTravelTime());
     static Comparator<Edge> fareComparator = (Edge e1, Edge e2) -> Double.compare(e1.getFare(), e2.getFare());
@@ -35,8 +37,10 @@ public class AdjListGraph {
         this.V = V;
         terminals = new ArrayList<>();
         terminalNames = new ArrayList<>();
+        hasPrefMode = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
+            hasPrefMode.add(new HashSet<>());
         }
         hasAlternatePaths = new boolean[V + 5];
         ratingThreshold = 0;
@@ -54,6 +58,8 @@ public class AdjListGraph {
     public void addEdge(String mode, int src, int dest, double dist, double fare, double spd) {
         terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
         pathsToDest[dest] += 1;
+
+        if (!hasPrefMode.get(dest).contains(mode)) hasPrefMode.get(dest).add(mode);
     }
 
     public void addEdge(String mode, String src, String dest, double dist, double fare, double spd) {
@@ -113,7 +119,7 @@ public class AdjListGraph {
     }
 
     //dijkstra
-    public void findShortestPath(String str, int src, int dest) {
+    public void findShortestPath(String str, int src, int dest, String prefMode) {
         PriorityQueue<Edge> pq;
 
         double dist[][] = new double[V + 5][V + 5];
@@ -176,7 +182,7 @@ public class AdjListGraph {
         //edge going to destination that has the lowest distance
         //makes sure that all other paths have been exhausted first and pq is empty
         //saves the edge so that it can be accessed outside the loop
-        Edge min = new Edge("none", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
+        Edge min = new Edge("", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
         int countToDest = 0;
 
         while (!pq.isEmpty()) {
@@ -192,6 +198,8 @@ public class AdjListGraph {
                 if (countToDest == pathsToDest[dest]) break;
                 continue;
             }
+
+            if (!curr.getMode().equals(prefMode) && hasPrefMode.get(dest).contains(prefMode)) continue;
 
             //main dijksra algos
             //only includes paths with ratings already
@@ -253,7 +261,7 @@ public class AdjListGraph {
             }
         }
 
-        if (!min.getMode().equals("none")) {
+        if (!min.getMode().equals("")) {
             System.out.println("Found destination.");
             ArrayList<Edge> path = new ArrayList<>();
             double[] values = new double[5];
