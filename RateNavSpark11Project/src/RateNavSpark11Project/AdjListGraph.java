@@ -65,6 +65,10 @@ public class AdjListGraph {
             hasAlternatePaths[dest] = true;
     }
 
+    public void setSpeed(String name, double spd) {
+        getEdge(name).setSpeed(spd);
+    }
+
     public void addEdge(String name, String mode, int src, int dest, double dist, double fare, double spd) {
         if (!terminalNames.containsKey(name)) {
             Edge e = new Edge(name, mode, src, dest, dist, fare, spd);
