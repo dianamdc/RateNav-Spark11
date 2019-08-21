@@ -155,6 +155,12 @@ public class AdjListGraph {
         return false;
     }
 
+    public void ratePaths(ArrayList<Edge> list, double rating) {
+        for (Edge e : list) {
+            e.setRating(rating);
+        }
+    }
+
     //dijkstra
     public void findShortestPath(String str, int src, int dest) {
         PriorityQueue<Edge> pq;
