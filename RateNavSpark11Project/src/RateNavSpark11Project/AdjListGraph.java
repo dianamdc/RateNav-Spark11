@@ -57,6 +57,14 @@ public class AdjListGraph {
         }
     }
 
+    public void addRating(String name, double rating) {
+        Edge e = getEdge(name);
+        e.addRating(rating);
+        int dest = e.getDestination();
+        if (rating >= ratingThreshold && !hasAlternatePaths[dest] && pathsToDest[dest] > 1)
+            hasAlternatePaths[dest] = true;
+    }
+
     public void setRating(String name, double rating) {
         Edge e = getEdge(name);
         e.setRating(rating);
@@ -157,7 +165,7 @@ public class AdjListGraph {
 
     public void ratePaths(ArrayList<Edge> list, double rating) {
         for (Edge e : list) {
-            e.setRating(rating);
+            e.addRating(rating);
         }
     }
 
@@ -440,6 +448,11 @@ class Edge {
     }
 
     public void setRating(double rating) {
+        if (numOfRatings == 0) warnings.remove("No ratings yet.");
+        this.rating = rating;
+    }
+
+    public void addRating(double rating) {
         if (numOfRatings == 0) warnings.remove("No ratings yet.");
         this.rating = (rating + this.rating) / ++numOfRatings;
     }
