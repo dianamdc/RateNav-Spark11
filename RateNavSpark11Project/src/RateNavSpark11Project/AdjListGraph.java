@@ -350,17 +350,17 @@ public class AdjListGraph {
                 values[2] += e.computeTravelTime();
                 values[3] += e.getFare();
                 values[4] += e.getRating();
-                System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f, "
-                        + "speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
+                System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f km, "
+                        + "speed: %5.2f kph, travel time: %5.2f mins, fare: Php %5.2f, rating: %5.2f (%2d)",
                         e.getMode(), destinationNames.get(e.getSource()), destinationNames.get(e.getDestination()), e.getDistance(),
                         e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                 System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
             }
 
             //prints all the total values
-            System.out.printf("Total distance: %6.2f%n", values[1]);
-            System.out.printf("Total time:     %6.2f%n", values[2]);
-            System.out.printf("Total fare:     %6.2f%n", values[3]);
+            System.out.printf("Total distance: %6.2f%n km", values[1]);
+            System.out.printf("Total time:     %6.2f%n mins", values[2]);
+            System.out.printf("Total fare:     Php %6.2f%n", values[3]);
             System.out.printf("Average rating: %6.2f%n", values[4] / path.size());
 
             return;
@@ -432,7 +432,7 @@ class Edge {
     }
 
     public double computeTravelTime() {
-        return dist / (spd);
+        return dist / (spd / 60);
     }
 
     public String getMode() {
