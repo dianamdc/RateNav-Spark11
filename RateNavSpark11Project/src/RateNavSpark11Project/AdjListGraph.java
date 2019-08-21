@@ -7,6 +7,7 @@ package RateNavSpark11Project;
  */
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -23,7 +24,7 @@ public class AdjListGraph {
     private boolean[] hasAlternatePaths;
     private double ratingThreshold;
     private ArrayList<String> destinationNames;
-    private HashSet<String> terminalNames;
+    private HashMap<String, int[]> terminalNames; //saves terminal names and their position in variable named terminals
     private int[] pathsToDest; //number of paths going to a destination of index i
     //private ArrayList<Set<String>> hasPrefMode; //checks if there is a
 
@@ -37,7 +38,7 @@ public class AdjListGraph {
         this.V = V;
         terminals = new ArrayList<>();
         destinationNames = new ArrayList<>();
-        terminalNames = new HashSet<>();
+        terminalNames = new HashMap<>();
         //hasPrefMode = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
@@ -56,7 +57,8 @@ public class AdjListGraph {
         }
     }
 
-    public void setRating(Edge e, double rating) {
+    public void setRating(String name, double rating) {
+        Edge e = getEdge(name);
         e.setRating(rating);
         int dest = e.getDestination();
         if (rating >= ratingThreshold && !hasAlternatePaths[dest] && pathsToDest[dest] > 1)
@@ -64,9 +66,15 @@ public class AdjListGraph {
     }
 
     public void addEdge(String name, String mode, int src, int dest, double dist, double fare, double spd) {
-        if (!terminalNames.contains(name)) {
-            terminals.get(src).add(new Edge(name, mode, src, dest, dist, fare, spd));
+        if (!terminalNames.containsKey(name)) {
+            Edge e = new Edge(name, mode, src, dest, dist, fare, spd);
+            terminals.get(src).add(e);
             pathsToDest[dest] += 1;
+
+            int pos[] = new int[2]; //position in variable named terminals
+            pos[0] = src;
+            pos[1] = terminals.get(src).indexOf(e);
+            terminalNames.put(name, pos);
         } else {
             System.out.println("Terminal named " + name + " already exists.");
         }
@@ -74,15 +82,21 @@ public class AdjListGraph {
     }
 
     public void addEdge(String name, String mode, String src, String dest, double dist, double fare, double spd) {
-        if (!terminalNames.contains(name)) {
+        if (!terminalNames.containsKey(name)) {
             int dest_i = destinationNames.indexOf(dest);
             int src_i = destinationNames.indexOf(src);
             if (dest_i == -1 || src_i == -1) {
                 System.out.println("Terminal does not exist.");
                 return;
             }
-            terminals.get(src_i).add(new Edge(name, mode, src_i, dest_i, dist, fare, spd));
+            Edge e = new Edge(name, mode, src_i, dest_i, dist, fare, spd);
+            terminals.get(src_i).add(e);
             pathsToDest[dest_i] += 1;
+
+            int pos[] = new int[2]; //position in variable named terminals
+            pos[0] = src_i;
+            pos[1] = terminals.get(src_i).indexOf(e);
+            terminalNames.put(name, pos);
         } else {
             System.out.println("Terminal named " + name + " already exists.");
         }
@@ -94,6 +108,10 @@ public class AdjListGraph {
             list.add(x.getDestination());
         }
         return list;
+    }
+
+    public Edge getEdge(String name) {
+        return terminals.get(terminalNames.get(name)[0]).get(terminalNames.get(name)[1]);
     }
 
     public ArrayList<ArrayList<Edge>> getTerminals() {
