@@ -22,7 +22,8 @@ public class AdjListGraph {
     private ArrayList<ArrayList<Edge>> terminals;
     private boolean[] hasAlternatePaths;
     private double ratingThreshold;
-    private ArrayList<String> terminalNames;
+    private ArrayList<String> destinationNames;
+    private HashSet<String> terminalNames;
     private int[] pathsToDest; //number of paths going to a destination of index i
     //private ArrayList<Set<String>> hasPrefMode; //checks if there is a
 
@@ -35,7 +36,8 @@ public class AdjListGraph {
     public AdjListGraph(int V) {
         this.V = V;
         terminals = new ArrayList<>();
-        terminalNames = new ArrayList<>();
+        destinationNames = new ArrayList<>();
+        terminalNames = new HashSet<>();
         //hasPrefMode = new ArrayList<>();
         for (int i = 0; i < V; i++) {
             terminals.add(new ArrayList<>());
@@ -61,22 +63,29 @@ public class AdjListGraph {
             hasAlternatePaths[dest] = true;
     }
 
-    public void addEdge(String mode, int src, int dest, double dist, double fare, double spd) {
-        terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
-        pathsToDest[dest] += 1;
-
+    public void addEdge(String name, String mode, int src, int dest, double dist, double fare, double spd) {
+        if (!terminalNames.contains(name)) {
+            terminals.get(src).add(new Edge(name, mode, src, dest, dist, fare, spd));
+            pathsToDest[dest] += 1;
+        } else {
+            System.out.println("Terminal named " + name + " already exists.");
+        }
         //if (!hasPrefMode.get(dest).contains(mode)) hasPrefMode.get(dest).add(mode);
     }
 
-    public void addEdge(String mode, String src, String dest, double dist, double fare, double spd) {
-        int dest_i = terminalNames.indexOf(dest);
-        int src_i = terminalNames.indexOf(src);
-        if (dest_i == -1 || src_i == -1) {
-            System.out.println("Terminal does not exist.");
-            return;
+    public void addEdge(String name, String mode, String src, String dest, double dist, double fare, double spd) {
+        if (!terminalNames.contains(name)) {
+            int dest_i = destinationNames.indexOf(dest);
+            int src_i = destinationNames.indexOf(src);
+            if (dest_i == -1 || src_i == -1) {
+                System.out.println("Terminal does not exist.");
+                return;
+            }
+            terminals.get(src_i).add(new Edge(name, mode, src_i, dest_i, dist, fare, spd));
+            pathsToDest[dest_i] += 1;
+        } else {
+            System.out.println("Terminal named " + name + " already exists.");
         }
-        terminals.get(src_i).add(new Edge(mode, src_i, dest_i, dist, fare, spd));
-        pathsToDest[dest_i] += 1;
     }
 
     public List<Integer> getAdjacentVertices(int src) {
@@ -91,16 +100,16 @@ public class AdjListGraph {
         return terminals;
     }
 
-    public ArrayList<String> getTerminalNames() {
-        return terminalNames;
+    public ArrayList<String> getDestinationNames() {
+        return destinationNames;
     }
 
-    public void setTerminalNames(ArrayList<String> t) {
-        this.terminalNames = t;
+    public void setDestinationNames(ArrayList<String> t) {
+        this.destinationNames = t;
     }
 
     public void setTerminalName(String t, int i) {
-        this.terminalNames.add(i, t);
+        this.destinationNames.add(i, t);
     }
 
     public int getV() {
@@ -188,7 +197,7 @@ public class AdjListGraph {
         //edge going to destination that has the lowest distance
         //makes sure that all other paths have been exhausted first and pq is empty
         //saves the edge so that it can be accessed outside the loop
-        Edge min = new Edge("", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
+        Edge min = new Edge("", "", V, V, 1_000_000_000, 1_000_000_000, 1_000_000_000);
         int countToDest = 0;
 
         while (!pq.isEmpty()) {
@@ -266,7 +275,7 @@ public class AdjListGraph {
             }
         }
 
-        if (!min.getMode().equals("")) {
+        if (!min.getName().equals("")) {
             System.out.println("Found destination.");
             ArrayList<Edge> path = new ArrayList<>();
             double[] values = new double[5];
@@ -295,7 +304,7 @@ public class AdjListGraph {
                     break;
             }
 
-            System.out.println("from " + terminalNames.get(src) + " to " + terminalNames.get(dest) + ": ");
+            System.out.println("from " + destinationNames.get(src) + " to " + destinationNames.get(dest) + ": ");
 
             //prints all the values for each path visited
             for (int i = path.size() - 1; i >= 0; i--) {
@@ -307,7 +316,7 @@ public class AdjListGraph {
                 values[4] += e.getRating();
                 System.out.printf("    %-10s src: %10s, dest: %10s, distance: %5.2f, "
                         + "speed: %5.2f, travel time: %5.2f, fare: %5.2f, rating: %5.2f (%2d)",
-                        e.getMode(), terminalNames.get(e.getSource()), terminalNames.get(e.getDestination()), e.getDistance(),
+                        e.getMode(), destinationNames.get(e.getSource()), destinationNames.get(e.getDestination()), e.getDistance(),
                         e.getSpeed(), e.computeTravelTime(), e.getFare(), e.getRating(), e.getNumberOfRatings());
                 System.out.println(", warnings: " + (e.getWarnings().isEmpty() ? "none" : e.getWarnings()));
             }
@@ -328,12 +337,13 @@ public class AdjListGraph {
 
 class Edge {
 
-    private String mode;
+    private String name, mode;
     private int src, dest, numOfRatings;
     private double fare, dist, spd, rating;
     private Set warnings = new HashSet();
 
-    public Edge(String mode, int src, int dest, double dist, double fare, double spd) {
+    public Edge(String name, String mode, int src, int dest, double dist, double fare, double spd) {
+        this.name = name;
         this.mode = mode;
         this.src = src;
         this.dest = dest;
@@ -395,6 +405,10 @@ class Edge {
 
     public int getNumberOfRatings() {
         return numOfRatings;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setRating(double rating) {
