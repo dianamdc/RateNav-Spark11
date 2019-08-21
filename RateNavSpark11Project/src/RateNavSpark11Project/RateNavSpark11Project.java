@@ -39,7 +39,6 @@ public class RateNavSpark11Project {
                     graph.addEdge(str, sc.nextInt(), sc.nextInt(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
                 }
 
-                graph.getTerminals().get(0).get(0).setRating(10);
                 graph.setTerminalNames(terminals);
 
                 graph.findShortestPath("distance", 1, 4);

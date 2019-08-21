@@ -54,6 +54,13 @@ public class AdjListGraph {
         }
     }
 
+    public void setRating(Edge e, double rating) {
+        e.setRating(rating);
+        int dest = e.getDestination();
+        if (rating >= ratingThreshold && !hasAlternatePaths[dest] && pathsToDest[dest] > 1)
+            hasAlternatePaths[dest] = true;
+    }
+
     public void addEdge(String mode, int src, int dest, double dist, double fare, double spd) {
         terminals.get(src).add(new Edge(mode, src, dest, dist, fare, spd));
         pathsToDest[dest] += 1;
