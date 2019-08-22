@@ -40,7 +40,13 @@ public class RateNavSpark11Project {
                     String str = sc.next();
                     if (str.equals("end")) break;
                     //gets data from input file
-                    graph.addEdge(str, sc.next(), sc.nextInt(), sc.nextInt(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
+                    graph.addEdge(str,
+                            sc.next(),
+                            sc.nextInt(),
+                            sc.nextInt(),
+                            sc.nextDouble(),
+                            sc.nextDouble(),
+                            sc.nextDouble());
                     graph.getEdge(str).setRating(sc.nextDouble());
                 }
 
