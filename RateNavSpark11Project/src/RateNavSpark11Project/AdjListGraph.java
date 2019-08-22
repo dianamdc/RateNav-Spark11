@@ -238,11 +238,16 @@ public class AdjListGraph {
 
         while (!pq.isEmpty()) {
             Edge curr = pq.poll();
-            //System.out.println(curr.getMode());
+            //System.out.println(min.getName());
 
             if (curr.getDestination() == dest) {
-                if (dist[min.getSource()][min.getDestination()] >= dist[curr.getSource()][curr.getDestination()])
-                    min = curr;
+                if (!str.equals("rating")) {
+                    if (dist[min.getSource()][min.getDestination()] >= dist[curr.getSource()][curr.getDestination()])
+                        min = curr;
+                } else {
+                    if (dist[min.getSource()][min.getDestination()] <= dist[curr.getSource()][curr.getDestination()])
+                        min = curr;
+                }
                 countToDest++;
 
                 //if all paths going to destination have been visited, loop terminates
@@ -250,17 +255,14 @@ public class AdjListGraph {
                 continue;
             }
 
-            //if (!curr.getMode().equals(prefMode) && hasPrefMode.get(dest).contains(prefMode)) continue;
             //main dijksra algos
             //only includes paths with ratings already
             //is separated because rating looks for the highest ratings while the others looks for the lowest values
             if (str.equals("rating")) {
-                if (curr.getNumberOfRatings() == 0 || curr.getRating() < dist[curr.getSource()][curr.getDestination()]
-                        || this.hasAlternatePaths[curr.getDestination()]) continue;
-
+                if (curr.getWarnings().contains("No ratings yet.") || curr.getRating() < dist[curr.getSource()][curr.getDestination()]) continue;
+                //        || this.hasAlternatePaths[curr.getDestination()]) continue;
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     double valueToAdd = adj.getRating();
-
                     if (dist[curr.getDestination()][adj.getDestination()] < dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
                         dist[curr.getDestination()][adj.getDestination()] = dist[curr.getSource()][curr.getDestination()] + valueToAdd;
                         pq.add(adj);
@@ -340,7 +342,7 @@ public class AdjListGraph {
                     break;
             }
 
-            System.out.println("from " + destinationNames.get(src) + " to " + destinationNames.get(dest) + ": ");
+            System.out.println(" from " + destinationNames.get(src) + " to " + destinationNames.get(dest) + ": ");
 
             //prints all the values for each path visited
             for (int i = path.size() - 1; i >= 0; i--) {
