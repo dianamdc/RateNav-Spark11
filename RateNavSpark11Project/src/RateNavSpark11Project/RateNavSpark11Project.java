@@ -8,7 +8,6 @@ package RateNavSpark11Project;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -20,8 +19,6 @@ public class RateNavSpark11Project {
     /**
      * @param args the command line arguments
      */
-    static ArrayList<String> terminals = new ArrayList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
-
     public static void main(String[] args) {
         try {
             Scanner sc = new Scanner(new File("src/testdata/input.txt")); //file path here
@@ -31,26 +28,29 @@ public class RateNavSpark11Project {
                 System.out.println("Case " + (i + 1) + ": ");
                 int V = sc.nextInt();
                 AdjListGraph graph = new AdjListGraph(V);
+                ArrayList<String> terminals = new ArrayList<>();
+
+                for (int j = 0; j < V; j++) {
+                    terminals.add(sc.next());
+                }
+
+                graph.setDestinationNames(terminals);
 
                 while (true) {
                     String str = sc.next();
                     if (str.equals("end")) break;
                     //gets data from input file
                     graph.addEdge(str, sc.next(), sc.nextInt(), sc.nextInt(), sc.nextDouble(), sc.nextDouble(), sc.nextDouble());
+                    graph.getEdge(str).setRating(sc.nextDouble());
                 }
 
-                graph.setDestinationNames(terminals);
+                int S = sc.nextInt();
+                for (int j = 0; j < S; j++) {
+                    graph.findShortestPath(sc.next(), sc.nextInt(), sc.nextInt());
+                    System.out.println();
+                }
 
-                graph.findShortestPath("distance", 1, 4);
-                System.out.println();
-                graph.findShortestPath("fare", 0, 5);
-                System.out.println();
-                graph.findShortestPath("x", 0, 5);
-                System.out.println();
-                graph.findShortestPath("time", 0, 5);
-                System.out.println();
-                graph.findShortestPath("rating", 0, 5);
-                System.out.println();
+                System.out.println("Test case " + (i + 1) + " end.");
             }
 
             sc.close();
