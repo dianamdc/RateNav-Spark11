@@ -4,3 +4,5 @@ names of sources/destinations
 name_of_terminal mode sorce destination distance(km) fare(php) speed(kph)
 rating for edge
 end //stops input of edges 
+no. of shortest paths
+"distance/time/fare/rating" source destination
