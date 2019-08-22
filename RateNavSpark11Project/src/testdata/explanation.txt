@@ -1,7 +1,7 @@
 no. of test cases
 no. of vertices
-names of sources/destinations
-name_of_terminal mode sorce destination distance(km) fare(php) speed(kph)
+names of sources/destinations (one per line)
+name_of_terminal mode source destination distance(km) fare(php) speed(kph)
 rating for edge
 end //stops input of edges 
 no. of shortest paths
