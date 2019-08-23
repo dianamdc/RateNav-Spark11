@@ -238,7 +238,7 @@ public class AdjListGraph {
 
         while (!pq.isEmpty()) {
             Edge curr = pq.poll();
-            //System.out.println(min.getName());
+            //System.out.println(curr.getDestination());
 
             if (curr.getDestination() == dest) {
                 if (!str.equals("rating")) {
@@ -256,11 +256,10 @@ public class AdjListGraph {
             }
 
             //main dijksra algos
-            //only includes paths with ratings already
             //is separated because rating looks for the highest ratings while the others looks for the lowest values
             if (str.equals("rating")) {
-                if (curr.getWarnings().contains("No ratings yet.") || curr.getRating() < dist[curr.getSource()][curr.getDestination()]) continue;
-                //        || this.hasAlternatePaths[curr.getDestination()]) continue;
+                if (curr.getRating() < dist[curr.getSource()][curr.getDestination()]
+                        || this.hasAlternatePaths[curr.getDestination()]) continue;
                 for (Edge adj : terminals.get(curr.getDestination())) {
                     double valueToAdd = adj.getRating();
                     if (dist[curr.getDestination()][adj.getDestination()] < dist[curr.getSource()][curr.getDestination()] + valueToAdd) {
@@ -368,7 +367,7 @@ public class AdjListGraph {
             return;
         }
 
-        System.out.println("Could not find route to destination.");
+        System.out.println("Could not find route for " + destinationNames.get(src) + " to " + destinationNames.get(dest) + ".");
     }
 
 }
