@@ -40,13 +40,33 @@ public class RateNavSpark11Project {
                     String str = sc.next();
                     if (str.equals("end")) break;
                     //gets data from input file
-                    graph.addEdge(str,
-                            sc.next(),
-                            sc.nextInt(),
-                            sc.nextInt(),
-                            sc.nextDouble(),
-                            sc.nextDouble(),
-                            sc.nextDouble());
+                    String mode = sc.next();
+                    String source = sc.next();
+                    String destination = sc.next();
+                    int src, dest;
+                    if (isInteger(source)) {
+                        src = Integer.parseInt(source);
+                        if (isInteger(destination)) {
+                            dest = Integer.parseInt(destination);
+
+                            graph.addEdge(str,
+                                    mode,
+                                    src,
+                                    dest,
+                                    sc.nextDouble(),
+                                    sc.nextDouble(),
+                                    sc.nextDouble());
+                        }
+                    } else {
+                        graph.addEdge(str,
+                                mode,
+                                source,
+                                destination,
+                                sc.nextDouble(),
+                                sc.nextDouble(),
+                                sc.nextDouble());
+                    }
+
                     graph.getEdge(str).setRating(sc.nextDouble());
                 }
 
@@ -63,6 +83,15 @@ public class RateNavSpark11Project {
 
         } catch (FileNotFoundException ex) {
             System.out.println("File not found.");
+        }
+    }
+
+    static public boolean isInteger(String input) {
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 
